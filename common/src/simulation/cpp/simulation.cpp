@@ -2,6 +2,8 @@
 #include "simulation/windows/control.h"
 #include "simulation/windows/motors.h"
 
+#include "simulation/joystick_controller.h"
+
 #include "hal/HAL.h"
 #include "mockdata/DriverStationData.h"
 
@@ -37,10 +39,14 @@ void harness::run(std::function<int()> robot_thread) {
   });
   thread.detach();
 
+  std::cout << "[SIM] Starting Joystick Controller" << std::endl;
+  joystick_controller::start();
+
   std::cout << "[SIM] Simulation Initialization Complete" << std::endl;
 
   while (true) {
     std::for_each(_windows.begin(), _windows.end(), bind(&ui::window::update));
+    joystick_controller::update();
     cv::waitKey(static_cast<int>(1000.0 / 45.0));
   }
 }
